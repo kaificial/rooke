@@ -1,29 +1,29 @@
 {
   "name": "rooke-chess",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview",
     "start": "node server.cjs",
-    "build": "tsc && vite build",
-    "preview": "vite preview"
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "devDependencies": {
-    "@types/express": "^5.0.6",
-    "autoprefixer": "^10.4.23",
-    "postcss": "^8.5.6",
-    "react-rewrite-cli": "^0.1.1",
-    "tailwindcss": "^4.1.18",
-    "tsx": "^4.21.0",
+    "@types/three": "^0.182.0",
     "typescript": "~5.9.3",
-    "vite": "^7.2.4"
+    "vite": "^7.2.4",
+    "vitest": "^3.2.7"
   },
   "dependencies": {
-    "@tailwindcss/postcss": "^4.1.18",
-    "@types/three": "^0.182.0",
     "express": "^5.2.1",
     "gsap": "^3.14.2",
     "three": "^0.182.0"
+  },
+  "engines": {
+    "node": ">=20"
   }
 }
