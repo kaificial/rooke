@@ -1,6 +1,5 @@
-import gsap from 'gsap'
 import * as THREE from 'three'
-import type { Color, Move } from '../core'
+import type { Move } from '../core'
 import { BOARD_TOP, squareToWorld } from '../scene/coords'
 import type { BoardView } from '../scene/boardView'
 import type { Stage } from '../scene/stage'
@@ -8,26 +7,16 @@ import type { Stage } from '../scene/stage'
 const CYAN = 0x00ffff
 const GOLD = 0xccb066
 
-const AURA_WINNING = 0x00ff00
-const AURA_LOSING = 0xff3300
-const AURA_EVEN = 0x0088ff
-const AURA_THRESHOLD = 100 // centipawns
-
 /**
  * Draws what the engine is thinking onto the 3D board:
  *  - an arrow for the move being considered (gold once it is decided),
  *  - a wireframe "ghost" of the piece after that move, plus a line through the
- *    rest of the line the engine expects,
- *  - a glowing ring around the engine king, colored by how it feels about the position.
+ *    rest of the line the engine expects.
  */
 export class AiVisualizer {
   private readonly board: BoardView
-  private readonly aiColor: Color
   private readonly arrows = new THREE.Group()
   private readonly ghosts = new THREE.Group()
-  private readonly aura = new THREE.Group()
-  private readonly auraRing: THREE.Mesh
-  private readonly auraGlow: THREE.Mesh
   private readonly ghostMaterial = new THREE.MeshBasicMaterial({
     color: CYAN,
     transparent: true,
@@ -36,53 +25,32 @@ export class AiVisualizer {
     blending: THREE.AdditiveBlending,
   })
 
-  constructor(stage: Stage, board: BoardView, aiColor: Color) {
+  constructor(stage: Stage, board: BoardView) {
     this.board = board
-    this.aiColor = aiColor
-
-    const auraMaterial = () =>
-      new THREE.MeshBasicMaterial({
-        color: AURA_EVEN,
-        side: THREE.DoubleSide,
-        transparent: true,
-        opacity: 0,
-        blending: THREE.AdditiveBlending,
-      })
-    this.auraRing = new THREE.Mesh(new THREE.RingGeometry(0.35, 0.45, 32), auraMaterial())
-    this.auraGlow = new THREE.Mesh(new THREE.RingGeometry(0.2, 0.6, 32), auraMaterial())
-    this.auraRing.rotation.x = this.auraGlow.rotation.x = -Math.PI / 2
-    this.auraRing.position.y = 0.01
-    this.auraGlow.position.y = 0
-    this.aura.add(this.auraRing, this.auraGlow)
-
-    stage.scene.add(this.arrows, this.ghosts, this.aura)
-    stage.onFrame(() => this.followKing())
+    stage.scene.add(this.arrows, this.ghosts)
   }
 
   /** A move the engine is still weighing. */
-  showCandidate(move: Move, pv: Move[], score: number): void {
+  showCandidate(move: Move, pv: Move[]): void {
     this.clear()
     this.addArrow(move, CYAN, 0.4)
     this.showLine(pv)
-    this.updateAura(score)
   }
 
   /** The move the engine settled on. */
-  showDecision(move: Move, pv: Move[], score: number): void {
+  showDecision(move: Move, pv: Move[]): void {
     this.clear()
     this.addArrow(move, GOLD, 0.8)
     this.showLine(pv)
-    this.updateAura(score)
   }
 
-  /** Removes arrows and ghosts. The aura stays so the engine mood is still visible. */
   clear(): void {
     this.arrows.clear()
     this.ghosts.clear()
   }
 
   setVisible(visible: boolean): void {
-    this.arrows.visible = this.ghosts.visible = this.aura.visible = visible
+    this.arrows.visible = this.ghosts.visible = visible
   }
 
   private addArrow(move: Move, color: number, opacity: number): void {
@@ -129,33 +97,5 @@ export class AiVisualizer {
       )
       this.ghosts.add(line)
     }
-  }
-
-  private updateAura(score: number): void {
-    // Positive scores favor white; flip so that positive always means "the engine is ahead".
-    const advantage = this.aiColor === 'w' ? score : -score
-
-    let color = AURA_EVEN
-    let intensity = 0.3
-    if (advantage > AURA_THRESHOLD) {
-      color = AURA_WINNING
-      intensity = 0.8
-    } else if (advantage < -AURA_THRESHOLD) {
-      color = AURA_LOSING
-      intensity = 0.6
-    }
-
-    const ring = this.auraRing.material as THREE.MeshBasicMaterial
-    const glow = this.auraGlow.material as THREE.MeshBasicMaterial
-    ring.color.set(color)
-    glow.color.set(color)
-    gsap.to(ring, { opacity: intensity, duration: 0.5 })
-    gsap.to(glow, { opacity: intensity * 0.3, duration: 0.5 })
-  }
-
-  private followKing(): void {
-    const square = this.board.findPiece('k', this.aiColor)
-    const position = square === null ? null : this.board.worldPositionOf(square)
-    if (position) this.aura.position.set(position.x, BOARD_TOP + 0.03, position.z)
   }
 }

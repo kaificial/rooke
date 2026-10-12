@@ -66,18 +66,6 @@ export class BoardView {
     return this.pieces.get(square) ?? null
   }
 
-  /** World position of a piece's mesh, for effects that follow it. */
-  worldPositionOf(square: Square): THREE.Vector3 | null {
-    return this.pieces.get(square)?.group.position ?? null
-  }
-
-  findPiece(type: PieceType, color: Color): Square | null {
-    for (const [square, view] of this.pieces) {
-      if (view.type === type && view.color === color) return square
-    }
-    return null
-  }
-
   /** A copy of the piece on `square` that can be restyled without touching the original. */
   cloneModel(square: Square): THREE.Group | null {
     return this.pieces.get(square)?.group.clone() ?? null
