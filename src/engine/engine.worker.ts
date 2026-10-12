@@ -4,6 +4,7 @@
 import { Position } from '../core'
 import type { BestMoveEvent, SearchEvent, SearchRequest } from './protocol'
 import { search } from './search'
+import { TranspositionTable } from './transposition'
 
 // The project compiles against the DOM lib, so give `self` the worker shape we use.
 const worker = self as unknown as {
@@ -11,24 +12,30 @@ const worker = self as unknown as {
   postMessage(message: SearchEvent): void
 }
 
+// Kept between searches: positions worked out for one move are often still useful on the next.
+const table = new TranspositionTable(20)
+
 worker.onmessage = (event) => {
-  const { id, fen, depth } = event.data
+  const { id, fen, maxDepth, timeMs, history } = event.data
 
   try {
     const position = Position.fromFen(fen)
 
     const result = search(position, {
-      depth,
-      onCandidate: (candidate) =>
+      maxDepth,
+      timeMs,
+      history,
+      table,
+      onProgress: (progress) =>
         worker.postMessage({
           type: 'thinking',
           id,
-          move: candidate.move,
-          score: candidate.score,
-          pv: candidate.pv,
-          depth,
-          nodes: candidate.nodes,
-          elapsedMs: candidate.elapsedMs,
+          move: progress.move,
+          score: progress.score,
+          pv: progress.pv,
+          depth: progress.depth,
+          nodes: progress.nodes,
+          elapsedMs: progress.elapsedMs,
         }),
     })
 
@@ -38,7 +45,7 @@ worker.onmessage = (event) => {
       move: result.move,
       score: result.score,
       pv: result.pv,
-      depth,
+      depth: result.depth,
       nodes: result.nodes,
       elapsedMs: result.elapsedMs,
     }

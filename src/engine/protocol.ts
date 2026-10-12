@@ -9,17 +9,23 @@ export interface SearchRequest {
   /** Echoed back on every event so stale results can be ignored. */
   id: number
   fen: string
-  depth: number
+  /** The deepest the engine may search, in plies. */
+  maxDepth: number
+  /** About how long it may think. It stops earlier when it has seen enough. */
+  timeMs: number
+  /** Hashes of earlier positions in the game as flat [lo, hi, ...] pairs, so it can see repetitions. */
+  history: number[]
 }
 
 export interface ThinkingEvent {
   type: 'thinking'
   id: number
-  /** The root move that was just searched. */
+  /** The best move the engine has found so far. It can change as the search gets deeper. */
   move: Move
   score: number
   /** The line the engine expects to follow from `move`. */
   pv: Move[]
+  /** How many plies deep the engine had searched when it found this. */
   depth: number
   nodes: number
   elapsedMs: number
