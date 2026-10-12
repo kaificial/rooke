@@ -30,11 +30,14 @@ export class Game {
   readonly history: PlayedMove[] = []
 
   private readonly seen = new Map<string, number>()
+  /** Hash of every position the game has been in, in order, ending with the current one. */
+  private readonly hashes: number[] = []
   private result: Outcome | null = null
 
   constructor(fen: string = START_FEN) {
     this.position = Position.fromFen(fen)
     this.seen.set(this.position.key(), 1)
+    this.hashes.push(this.position.hashLo, this.position.hashHi)
     this.result = this.evaluateOutcome()
   }
 
@@ -48,6 +51,14 @@ export class Game {
 
   get inCheck(): boolean {
     return this.position.inCheck()
+  }
+
+  /**
+   * Hashes of the positions before the current one, as flat [lo, hi, ...] pairs.
+   * The engine uses them to notice when a move would repeat a position.
+   */
+  previousPositionHashes(): number[] {
+    return this.hashes.slice(0, -2)
   }
 
   legalMoves(): Move[] {
@@ -78,6 +89,7 @@ export class Game {
     this.position.makeMove(move)
     const key = this.position.key()
     this.seen.set(key, (this.seen.get(key) ?? 0) + 1)
+    this.hashes.push(this.position.hashLo, this.position.hashHi)
 
     const played: PlayedMove = { move, san, color, moveNumber, check: san.endsWith('+') || san.endsWith('#') }
     this.history.push(played)

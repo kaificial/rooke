@@ -1,6 +1,17 @@
 import { isAttacked } from './attacks'
 import { fenChar, getPiece, pieceFromFenChar } from './pieces'
 import { parseSquare, squareName } from './squares'
+import {
+  CASTLING_HI,
+  CASTLING_LO,
+  EP_FILE_HI,
+  EP_FILE_LO,
+  PIECE_HI,
+  PIECE_LO,
+  SIDE_HI,
+  SIDE_LO,
+  pieceKey,
+} from './zobrist'
 import { opposite } from './types'
 import type { Color, Move, Piece, Square } from './types'
 
@@ -32,10 +43,13 @@ const CASTLE_ROOK_MOVES: Record<number, readonly [Square, Square]> = {
 }
 
 interface Undo {
-  move: Move
+  /** The move that was made, or null for a null move. */
+  move: Move | null
   castling: number
   epSquare: Square
   halfmove: number
+  hashLo: number
+  hashHi: number
 }
 
 /**
@@ -52,6 +66,9 @@ export class Position {
   epSquare: Square = -1
   halfmove = 0
   fullmove = 1
+  /** 64-bit Zobrist hash of the position, as two 32-bit halves. */
+  hashLo = 0
+  hashHi = 0
 
   private readonly kings: Record<Color, Square> = { w: -1, b: -1 }
   private readonly undoStack: Undo[] = []
@@ -87,6 +104,7 @@ export class Position {
     pos.epSquare = ep && ep !== '-' ? parseSquare(ep) : -1
     pos.halfmove = Number(half) || 0
     pos.fullmove = Number(full) || 1
+    pos.recomputeHash()
     return pos
   }
 
@@ -121,6 +139,31 @@ export class Position {
 
     const ep = this.epSquare >= 0 ? squareName(this.epSquare) : '-'
     return `${rows.join('/')} ${this.turn} ${rights || '-'} ${ep} ${this.halfmove} ${this.fullmove}`
+  }
+
+  /** Rebuilds the hash from scratch. Used on load and by tests to check the incremental updates. */
+  recomputeHash(): void {
+    let lo = 0
+    let hi = 0
+    for (let sq = 0; sq < 64; sq++) {
+      const piece = this.board[sq]
+      if (!piece) continue
+      const index = pieceKey(piece.type, piece.color, sq)
+      lo ^= PIECE_LO[index]
+      hi ^= PIECE_HI[index]
+    }
+    if (this.turn === 'b') {
+      lo ^= SIDE_LO
+      hi ^= SIDE_HI
+    }
+    lo ^= CASTLING_LO[this.castling]
+    hi ^= CASTLING_HI[this.castling]
+    if (this.epSquare >= 0) {
+      lo ^= EP_FILE_LO[this.epSquare & 7]
+      hi ^= EP_FILE_HI[this.epSquare & 7]
+    }
+    this.hashLo = lo
+    this.hashHi = hi
   }
 
   /** Copy of the position without its undo history. */
@@ -176,29 +219,95 @@ export class Position {
       castling: this.castling,
       epSquare: this.epSquare,
       halfmove: this.halfmove,
+      hashLo: this.hashLo,
+      hashHi: this.hashHi,
     })
+
+    let lo = this.hashLo
+    let hi = this.hashHi
 
     const moving = this.board[move.from]!
     this.board[move.from] = null
+    let key = pieceKey(moving.type, color, move.from)
+    lo ^= PIECE_LO[key]
+    hi ^= PIECE_HI[key]
 
     if (move.enPassant) {
-      this.board[move.to + (color === 'w' ? 8 : -8)] = null
+      const capturedSquare = move.to + (color === 'w' ? 8 : -8)
+      this.board[capturedSquare] = null
+      key = pieceKey('p', them, capturedSquare)
+      lo ^= PIECE_LO[key]
+      hi ^= PIECE_HI[key]
+    } else if (move.captured) {
+      key = pieceKey(move.captured, them, move.to)
+      lo ^= PIECE_LO[key]
+      hi ^= PIECE_HI[key]
     }
-    this.board[move.to] = move.promotion ? getPiece(move.promotion, color) : moving
+
+    const placed = move.promotion ? getPiece(move.promotion, color) : moving
+    this.board[move.to] = placed
+    key = pieceKey(placed.type, color, move.to)
+    lo ^= PIECE_LO[key]
+    hi ^= PIECE_HI[key]
 
     if (move.castle) {
       const [rookFrom, rookTo] = CASTLE_ROOK_MOVES[move.to]
       this.board[rookTo] = this.board[rookFrom]
       this.board[rookFrom] = null
+      key = pieceKey('r', color, rookFrom)
+      lo ^= PIECE_LO[key]
+      hi ^= PIECE_HI[key]
+      key = pieceKey('r', color, rookTo)
+      lo ^= PIECE_LO[key]
+      hi ^= PIECE_HI[key]
     }
 
     if (move.piece === 'k') this.kings[color] = move.to
 
-    this.castling &= (RIGHTS_AFTER_TOUCHING[move.from] ?? 15) & (RIGHTS_AFTER_TOUCHING[move.to] ?? 15)
+    const rights = this.castling & (RIGHTS_AFTER_TOUCHING[move.from] ?? 15) & (RIGHTS_AFTER_TOUCHING[move.to] ?? 15)
+    lo ^= CASTLING_LO[this.castling] ^ CASTLING_LO[rights]
+    hi ^= CASTLING_HI[this.castling] ^ CASTLING_HI[rights]
+    this.castling = rights
+
+    if (this.epSquare >= 0) {
+      lo ^= EP_FILE_LO[this.epSquare & 7]
+      hi ^= EP_FILE_HI[this.epSquare & 7]
+    }
     this.epSquare = move.doublePush ? (move.from + move.to) >> 1 : -1
+    if (this.epSquare >= 0) {
+      lo ^= EP_FILE_LO[this.epSquare & 7]
+      hi ^= EP_FILE_HI[this.epSquare & 7]
+    }
+
     this.halfmove = move.piece === 'p' || move.captured ? 0 : this.halfmove + 1
     if (color === 'b') this.fullmove++
     this.turn = them
+    this.hashLo = lo ^ SIDE_LO
+    this.hashHi = hi ^ SIDE_HI
+  }
+
+  /** Passes the turn without moving, for null-move pruning in the search. */
+  makeNullMove(): void {
+    this.undoStack.push({
+      move: null,
+      castling: this.castling,
+      epSquare: this.epSquare,
+      halfmove: this.halfmove,
+      hashLo: this.hashLo,
+      hashHi: this.hashHi,
+    })
+    let lo = this.hashLo ^ SIDE_LO
+    let hi = this.hashHi ^ SIDE_HI
+    if (this.epSquare >= 0) {
+      lo ^= EP_FILE_LO[this.epSquare & 7]
+      hi ^= EP_FILE_HI[this.epSquare & 7]
+      this.epSquare = -1
+    }
+    this.hashLo = lo
+    this.hashHi = hi
+    this.halfmove++
+    if (this.turn === 'b') this.fullmove++
+    this.turn = opposite(this.turn)
   }
 
   unmakeMove(): void {
@@ -210,6 +319,13 @@ export class Position {
     const color = this.turn
     const them = opposite(color)
     if (color === 'b') this.fullmove--
+
+    this.castling = undo.castling
+    this.epSquare = undo.epSquare
+    this.halfmove = undo.halfmove
+    this.hashLo = undo.hashLo
+    this.hashHi = undo.hashHi
+    if (!move) return // a null move changed nothing else
 
     this.board[move.from] = getPiece(move.piece, color)
     this.board[move.to] = null
@@ -227,9 +343,5 @@ export class Position {
     }
 
     if (move.piece === 'k') this.kings[color] = move.from
-
-    this.castling = undo.castling
-    this.epSquare = undo.epSquare
-    this.halfmove = undo.halfmove
   }
 }
