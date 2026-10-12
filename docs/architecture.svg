@@ -1,0 +1,121 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 520" font-family="'Courier New', Consolas, monospace">
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 0 L10 5 L0 10 z" fill="#ccb066"/>
+    </marker>
+    <marker id="w" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M0 0 L10 5 L0 10 z" fill="#666"/>
+    </marker>
+    <pattern id="dots" width="20" height="20" patternUnits="userSpaceOnUse">
+      <circle cx="1" cy="1" r="1" fill="#ffffff" fill-opacity="0.05"/>
+    </pattern>
+  </defs>
+
+  <rect width="960" height="520" fill="#090909"/>
+  <rect width="960" height="520" fill="url(#dots)"/>
+
+  <text x="30" y="36" fill="#ccb066" font-size="13" font-weight="700" letter-spacing="3">HOW ROOKE IS PUT TOGETHER</text>
+
+  <!-- main thread panel -->
+  <rect x="20" y="60" width="600" height="300" fill="#0e0e0e" stroke="#2a2a2a"/>
+  <path d="M20 72 V60 H32" stroke="#ccb066" fill="none"/>
+  <path d="M620 348 V360 H608" stroke="#ccb066" fill="none"/>
+  <text x="36" y="82" fill="#ccb066" font-size="11" font-weight="700" letter-spacing="2">MAIN THREAD</text>
+
+  <!-- worker panel -->
+  <rect x="720" y="60" width="220" height="300" fill="#0e0e0e" stroke="#2a2a2a"/>
+  <path d="M720 72 V60 H732" stroke="#ccb066" fill="none"/>
+  <path d="M940 348 V360 H928" stroke="#ccb066" fill="none"/>
+  <text x="736" y="82" fill="#ccb066" font-size="11" font-weight="700" letter-spacing="2">WEB WORKER</text>
+
+  <!-- app wiring -->
+  <rect x="40" y="96" width="560" height="44" fill="#161616" stroke="#3a3a3a"/>
+  <text x="56" y="116" fill="#ddd" font-size="12" font-weight="700">main.ts + app.ts</text>
+  <text x="56" y="131" fill="#777" font-size="10.5">build the scene, show the home page, wire a game together for the chosen mode</text>
+
+  <!-- controller -->
+  <rect x="40" y="166" width="560" height="60" fill="#161616" stroke="#ccb066"/>
+  <text x="56" y="187" fill="#ccb066" font-size="12" font-weight="700">game/  GameController</text>
+  <text x="56" y="203" fill="#777" font-size="10.5">taps in, moves out. Decides what happens when: selection, promotion, clocks,</text>
+  <text x="56" y="217" fill="#777" font-size="10.5">engine turns, game over. The only place that knows both rules and pictures.</text>
+
+  <g stroke="#666" fill="none" marker-end="url(#w)">
+    <path d="M320 140 V164"/>
+    <path d="M128 226 V252"/>
+    <path d="M320 226 V252"/>
+    <path d="M512 226 V252"/>
+  </g>
+
+  <!-- three feature modules -->
+  <g fill="#161616" stroke="#3a3a3a">
+    <rect x="40" y="254" width="176" height="86"/>
+    <rect x="232" y="254" width="176" height="86"/>
+    <rect x="424" y="254" width="176" height="86"/>
+  </g>
+  <g fill="#ddd" font-size="12" font-weight="700">
+    <text x="54" y="274">scene/</text>
+    <text x="246" y="274">ui/</text>
+    <text x="438" y="274">ai/</text>
+  </g>
+  <g fill="#777" font-size="10.5">
+    <text x="54" y="292">BoardView</text>
+    <text x="54" y="306">piece meshes</text>
+    <text x="54" y="320">stage, lights</text>
+
+    <text x="246" y="292">home page</text>
+    <text x="246" y="306">sidebar, clocks</text>
+    <text x="246" y="320">AI log, trays</text>
+
+    <text x="438" y="292">AiPlayer</text>
+    <text x="438" y="306">visualizer, narrator</text>
+    <text x="438" y="320">worker client</text>
+  </g>
+
+  <!-- engine boxes -->
+  <g fill="#161616" stroke="#3a3a3a">
+    <rect x="736" y="100" width="188" height="64"/>
+    <rect x="736" y="186" width="188" height="72"/>
+    <rect x="736" y="280" width="188" height="64"/>
+  </g>
+  <g fill="#ddd" font-size="12" font-weight="700">
+    <text x="750" y="120">engine.worker.ts</text>
+    <text x="750" y="206">search.ts</text>
+    <text x="750" y="300">evaluate.ts</text>
+  </g>
+  <g fill="#777" font-size="10.5">
+    <text x="750" y="138">parse request,</text>
+    <text x="750" y="152">post each result</text>
+    <text x="750" y="224">negamax, alpha-beta,</text>
+    <text x="750" y="238">quiescence, ordering,</text>
+    <text x="750" y="252">mate scores</text>
+    <text x="750" y="318">material + piece-</text>
+    <text x="750" y="332">square tables</text>
+  </g>
+  <g stroke="#666" fill="none" marker-end="url(#w)">
+    <path d="M830 164 V184"/>
+    <path d="M830 258 V278"/>
+  </g>
+
+  <!-- messages between ai/ and the worker -->
+  <path d="M600 300 H660 V132 H734" stroke="#ccb066" stroke-width="1.6" fill="none" marker-start="url(#a)" marker-end="url(#a)"/>
+  <text x="626" y="200" fill="#ccb066" font-size="10" font-weight="700" text-anchor="middle">FEN</text>
+  <text x="626" y="213" fill="#ccb066" font-size="10" font-weight="700" text-anchor="middle">+ depth</text>
+  <text x="626" y="238" fill="#888" font-size="10" text-anchor="middle">thinking</text>
+  <text x="626" y="251" fill="#888" font-size="10" text-anchor="middle">bestMove</text>
+
+  <!-- core band -->
+  <rect x="20" y="400" width="920" height="84" fill="#0e0e0e" stroke="#ccb066"/>
+  <text x="36" y="424" fill="#ccb066" font-size="12" font-weight="700" letter-spacing="2">CORE</text>
+  <text x="104" y="424" fill="#ddd" font-size="12">pure TypeScript. No DOM, no Three.js, no timers.</text>
+  <text x="36" y="446" fill="#777" font-size="10.5">Position (make / unmake)  |  movegen (legal moves, perft-tested)  |  Game (rules, result, repetition)  |  SAN</text>
+  <text x="36" y="464" fill="#777" font-size="10.5">The same code decides which squares light up for you and which moves the engine is allowed to search.</text>
+
+  <g stroke="#ccb066" stroke-dasharray="4 4" fill="none" marker-end="url(#a)">
+    <path d="M320 400 V362"/>
+    <path d="M830 400 V362"/>
+  </g>
+  <text x="334" y="385" fill="#888" font-size="10">imports</text>
+  <text x="844" y="385" fill="#888" font-size="10">imports</text>
+
+  <text x="480" y="508" fill="#555" font-size="10" text-anchor="middle">Dependencies only point down. core/ knows nothing about anything above it.</text>
+</svg>

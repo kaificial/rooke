@@ -1,0 +1,103 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 520" font-family="'Courier New', Consolas, monospace">
+  <defs>
+    <pattern id="dots" width="20" height="20" patternUnits="userSpaceOnUse">
+      <circle cx="1" cy="1" r="1" fill="#ffffff" fill-opacity="0.05"/>
+    </pattern>
+    <radialGradient id="glow">
+      <stop offset="0.45" stop-color="#2cff7a" stop-opacity="0"/>
+      <stop offset="0.7" stop-color="#2cff7a" stop-opacity="0.55"/>
+      <stop offset="1" stop-color="#2cff7a" stop-opacity="0"/>
+    </radialGradient>
+    <marker id="g" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto">
+      <path d="M0 0 L10 5 L0 10 z" fill="#ccb066"/>
+    </marker>
+    <marker id="gd" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto">
+      <path d="M0 0 L10 5 L0 10 z" fill="#00ffff" fill-opacity="0.55"/>
+    </marker>
+  </defs>
+  <rect width="960" height="520" fill="#090909"/>
+  <rect width="960" height="520" fill="url(#dots)"/>
+
+  <text x="30" y="36" fill="#ccb066" font-size="13" font-weight="700" letter-spacing="3">WHAT YOU SEE WHILE THE ENGINE THINKS</text>
+
+  <!-- board: origin (40,60), cell 50 -->
+  <g>
+    <!-- squares -->
+    <rect x="40" y="60" width="400" height="400" fill="#221108"/>
+    <g fill="#e0d6c3">
+      <rect x="40" y="60" width="50" height="50"/><rect x="140" y="60" width="50" height="50"/><rect x="240" y="60" width="50" height="50"/><rect x="340" y="60" width="50" height="50"/>
+      <rect x="90" y="110" width="50" height="50"/><rect x="190" y="110" width="50" height="50"/><rect x="290" y="110" width="50" height="50"/><rect x="390" y="110" width="50" height="50"/>
+      <rect x="40" y="160" width="50" height="50"/><rect x="140" y="160" width="50" height="50"/><rect x="240" y="160" width="50" height="50"/><rect x="340" y="160" width="50" height="50"/>
+      <rect x="90" y="210" width="50" height="50"/><rect x="190" y="210" width="50" height="50"/><rect x="290" y="210" width="50" height="50"/><rect x="390" y="210" width="50" height="50"/>
+      <rect x="40" y="260" width="50" height="50"/><rect x="140" y="260" width="50" height="50"/><rect x="240" y="260" width="50" height="50"/><rect x="340" y="260" width="50" height="50"/>
+      <rect x="90" y="310" width="50" height="50"/><rect x="190" y="310" width="50" height="50"/><rect x="290" y="310" width="50" height="50"/><rect x="390" y="310" width="50" height="50"/>
+      <rect x="40" y="360" width="50" height="50"/><rect x="140" y="360" width="50" height="50"/><rect x="240" y="360" width="50" height="50"/><rect x="340" y="360" width="50" height="50"/>
+      <rect x="90" y="410" width="50" height="50"/><rect x="190" y="410" width="50" height="50"/><rect x="290" y="410" width="50" height="50"/><rect x="390" y="410" width="50" height="50"/>
+    </g>
+    <rect x="40" y="60" width="400" height="400" fill="none" stroke="#3a2a1c" stroke-width="2"/>
+    <!-- file / rank labels -->
+    <g fill="#666" font-size="10" text-anchor="middle">
+      <text x="65" y="474">a</text><text x="115" y="474">b</text><text x="165" y="474">c</text><text x="215" y="474">d</text>
+      <text x="265" y="474">e</text><text x="315" y="474">f</text><text x="365" y="474">g</text><text x="415" y="474">h</text>
+    </g>
+  </g>
+
+  <!-- aura around black king (e8) -->
+  <circle cx="265" cy="85" r="34" fill="url(#glow)"/>
+  <circle cx="265" cy="85" r="26" fill="none" stroke="#2cff7a" stroke-width="2" stroke-opacity="0.9"/>
+
+  <!-- pieces -->
+  <g font-size="13" font-weight="700" text-anchor="middle">
+    <circle cx="265" cy="85" r="15" fill="#1a1a1a" stroke="#888"/><text x="265" y="90" fill="#ddd">K</text>
+    <circle cx="365" cy="85" r="15" fill="#1a1a1a" stroke="#888"/><text x="365" y="90" fill="#ddd">N</text>
+    <circle cx="265" cy="285" r="15" fill="#f1e9d8" stroke="#8a7f6a"/><text x="265" y="290" fill="#222">P</text>
+    <circle cx="215" cy="285" r="15" fill="#f1e9d8" stroke="#8a7f6a"/><text x="215" y="290" fill="#222">P</text>
+  </g>
+
+  <!-- candidate arrows from g8 (365,85) -->
+  <path d="M365 85 L322 163" stroke="#ccb066" stroke-width="5" fill="none" marker-end="url(#g)"/>
+  <path d="M365 85 L409 163" stroke="#00ffff" stroke-opacity="0.5" stroke-width="3" fill="none" marker-end="url(#gd)"/>
+  <path d="M365 85 L283 118" stroke="#00ffff" stroke-opacity="0.5" stroke-width="3" fill="none" marker-end="url(#gd)"/>
+
+  <!-- ghost: wireframe copy of the piece after the move, plus a line along the expected replies -->
+  <polyline points="315,185 265,235 215,235" fill="none" stroke="#00ffff" stroke-opacity="0.45" stroke-width="2"/>
+  <circle cx="265" cy="235" r="3" fill="#00ffff" fill-opacity="0.6"/>
+  <circle cx="215" cy="235" r="3" fill="#00ffff" fill-opacity="0.6"/>
+  <circle cx="315" cy="185" r="15" fill="#06292b" fill-opacity="0.9" stroke="#00ffff" stroke-width="1.6" stroke-dasharray="4 3"/>
+  <text x="315" y="190" fill="#00ffff" font-size="13" font-weight="700" text-anchor="middle">N</text>
+
+  <!-- callouts -->
+  <g font-size="11" font-weight="700">
+    <circle cx="500" cy="84" r="11" fill="#ccb066"/><text x="500" y="88" fill="#090909" text-anchor="middle">A</text>
+    <text x="522" y="80" fill="#ddd">Arrows</text>
+    <text x="522" y="96" fill="#888" font-weight="400" font-size="10.5">Each candidate is drawn in cyan as it is reviewed.</text>
+    <text x="522" y="109" fill="#888" font-weight="400" font-size="10.5">The final choice turns thick and gold.</text>
+
+    <circle cx="500" cy="152" r="11" fill="#00ffff"/><text x="500" y="156" fill="#090909" text-anchor="middle">B</text>
+    <text x="522" y="148" fill="#ddd">Ghost line</text>
+    <text x="522" y="164" fill="#888" font-weight="400" font-size="10.5">A wireframe copy of the piece after the move, and a</text>
+    <text x="522" y="177" fill="#888" font-weight="400" font-size="10.5">line through the squares the expected replies land on.</text>
+
+    <circle cx="500" cy="220" r="11" fill="#2cff7a"/><text x="500" y="224" fill="#090909" text-anchor="middle">C</text>
+    <text x="522" y="216" fill="#ddd">King aura</text>
+    <text x="522" y="232" fill="#888" font-weight="400" font-size="10.5">Green = it thinks it's winning. Red = losing.</text>
+    <text x="522" y="245" fill="#888" font-weight="400" font-size="10.5">Blue = about even.</text>
+  </g>
+
+  <!-- log panel -->
+  <rect x="490" y="280" width="440" height="190" fill="#0e0e0e" stroke="#2a2a2a"/>
+  <path d="M490 292 V280 H502" stroke="#ccb066" fill="none"/>
+  <path d="M930 458 V470 H918" stroke="#ccb066" fill="none"/>
+  <circle cx="512" cy="304" r="11" fill="#ccb066"/><text x="512" y="308" fill="#090909" font-size="11" font-weight="700" text-anchor="middle">D</text>
+  <text x="532" y="308" fill="#ccb066" font-size="11" font-weight="700" letter-spacing="2">AI THOUGHT PROCESS</text>
+  <line x1="506" y1="320" x2="914" y2="320" stroke="#262626"/>
+  <g font-size="10.5">
+    <text x="506" y="342" fill="#aaa">Thinking about moving Knight to h6 to improve its position (+0.10)</text>
+    <text x="506" y="364" fill="#aaa">Thinking about moving Knight to e7 to improve its position (+0.25)</text>
+    <text x="506" y="386" fill="#6fc">Aggressive move: Knight to f6 to improve its position (-0.45)</text>
+    <text x="506" y="414" fill="#fff" font-weight="700">Decided to move Knight to f6 to improve its position (-0.45)</text>
+  </g>
+  <text x="506" y="452" fill="#555" font-size="10">+ white is ahead, - black is ahead (in pawns)</text>
+
+  <text x="240" y="506" fill="#555" font-size="10" text-anchor="middle">Illustration of the overlay. The real one is drawn in 3D on the board.</text>
+</svg>
