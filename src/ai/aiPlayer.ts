@@ -22,15 +22,21 @@ interface Dependencies {
   visualizer: AiVisualizer
   log: ThoughtLog
   color: Color
-  depth: number
+  maxDepth: number
+  thinkTimeMs: number
   /** Asked each time, since the player can toggle the thought display mid-game. */
   thoughtsVisible: () => boolean
 }
 
 /**
- * Plays one side. For each turn it asks the worker for a move and then replays
- * the search to the player: one candidate at a time, with an arrow, a ghost
- * line and a log entry, so the decision is something you can follow.
+ * Plays one side. For each turn it asks the worker for a move and shows the
+ * search to the player as it goes: the engine's best move so far at each depth,
+ * with an arrow, a ghost line and a log entry, so the decision is something
+ * you can follow.
+ *
+ * The replay is kept short on purpose. Thoughts for the same depth collapse
+ * into the latest one, only the newest few are kept, and they play while the
+ * engine is still searching, so watching never makes it slower to move.
  */
 export class AiPlayer {
   private readonly deps: Dependencies
@@ -45,10 +51,13 @@ export class AiPlayer {
     return this.deps.color
   }
 
-  /** Resolves with the chosen move (null when there is none) once its thinking has been shown. */
-  chooseMove(position: Position): Promise<Move | null> {
+  /**
+   * Resolves with the chosen move (null when there is none) once its thinking has been shown.
+   * `history` is `Game.previousPositionHashes()`, so the engine can see repetitions.
+   */
+  chooseMove(position: Position, history: number[]): Promise<Move | null> {
     this.cancel()
-    const { client, depth } = this.deps
+    const { client, maxDepth, thinkTimeMs } = this.deps
     const id = ++this.requestId
     const mover = position.turn
 
@@ -99,18 +108,22 @@ export class AiPlayer {
         }
       }
 
-      client.search({ id, fen: position.toFen(), depth }, (event: SearchEvent) => {
+      client.search({ id, fen: position.toFen(), maxDepth, timeMs: thinkTimeMs, history }, (event: SearchEvent) => {
         if (event.type === 'error') {
           stop()
           reject(new Error(event.message))
           return
         }
 
-        queue.push(event)
-        // The worker is far faster than anyone can read. If a pile builds up,
-        // keep only the most recent few candidates and the final decision.
-        if (queue.length > CONFIG.ai.maxQueuedEvents) {
-          queue.splice(0, queue.length - CONFIG.ai.keepWhenTrimmed)
+        if (event.type === 'thinking') {
+          // A newer idea at the same depth replaces the one that hasn't been shown yet.
+          const last = queue[queue.length - 1]
+          if (last?.type === 'thinking' && last.depth === event.depth) queue[queue.length - 1] = event
+          else queue.push(event)
+          // Only the newest few are worth the screen time.
+          if (queue.length > CONFIG.ai.maxReplayLines) queue.splice(0, queue.length - CONFIG.ai.maxReplayLines)
+        } else {
+          queue.push(event)
         }
         if (playbackTimer === undefined && finishTimer === undefined) playNext()
       })
@@ -127,10 +140,10 @@ export class AiPlayer {
     const { visualizer, log, color } = this.deps
     const final = event.type === 'bestMove'
 
-    if (final) visualizer.showDecision(event.move, event.pv, event.score)
-    else visualizer.showCandidate(event.move, event.pv, event.score)
+    if (final) visualizer.showDecision(event.move, event.pv)
+    else visualizer.showCandidate(event.move, event.pv)
 
-    const { text, sentiment } = narrate(event.move, event.score, { mover, aiColor: color, final })
+    const { text, sentiment } = narrate(event.move, event.score, { mover, aiColor: color, final, depth: event.depth })
     log.add(text, sentiment)
   }
 }

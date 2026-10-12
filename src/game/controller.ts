@@ -178,7 +178,7 @@ export class GameController {
     this.busy = true
     this.hud.sidebar.setStatus(`${this.statusText()} - thinking...`)
     try {
-      const move = await this.ai.chooseMove(this.game.position)
+      const move = await this.ai.chooseMove(this.game.position, this.game.previousPositionHashes())
       if (!move || this.game.outcome) return
       await this.commit(move)
     } catch (error) {

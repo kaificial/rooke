@@ -14,8 +14,10 @@ interface NarrateOptions {
   mover: Color
   /** The side the engine plays, to decide what counts as good news. */
   aiColor: Color
-  /** True for the engine's final choice, false for a candidate it is weighing. */
+  /** True for the engine's final choice, false for a line it is still working on. */
   final: boolean
+  /** How many plies deep the engine had looked. */
+  depth?: number
 }
 
 const CENTER_SQUARES = new Set(['d4', 'e4', 'd5', 'e5'])
@@ -35,7 +37,7 @@ export function formatScore(score: number): string {
  * The reasons are simple heuristics (is it a capture, does it take the
  * center...). The score is the real search result; the "why" is a friendly gloss.
  */
-export function narrate(move: Move, score: number, { mover, aiColor, final }: NarrateOptions): Narration {
+export function narrate(move: Move, score: number, { mover, aiColor, final, depth }: NarrateOptions): Narration {
   const piece = capitalize(PIECE_NAMES[move.piece])
   const destination = squareName(move.to)
   const opponent = mover === 'w' ? 'Black' : 'White'
@@ -59,5 +61,6 @@ export function narrate(move: Move, score: number, { mover, aiColor, final }: Na
     sentiment = 'bad'
   }
 
-  return { text: `${label} ${piece} to ${destination} ${reason} (${formatScore(score)})`, sentiment }
+  const detail = depth ? `${formatScore(score)}, depth ${depth}` : formatScore(score)
+  return { text: `${label} ${piece} to ${destination} ${reason} (${detail})`, sentiment }
 }

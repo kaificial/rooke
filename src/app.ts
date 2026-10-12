@@ -27,13 +27,14 @@ export function launchGame(mode: GameMode, stage: Stage, board: BoardView): void
   let ai: AiPlayer | null = null
   let visualizer: AiVisualizer | null = null
   if (vsAi) {
-    visualizer = new AiVisualizer(stage, board, CONFIG.ai.color)
+    visualizer = new AiVisualizer(stage, board)
     ai = new AiPlayer({
       client: new AiClient(),
       visualizer,
       log: hud.log,
       color: CONFIG.ai.color,
-      depth: CONFIG.ai.depth,
+      maxDepth: CONFIG.ai.maxDepth,
+      thinkTimeMs: CONFIG.ai.thinkTimeMs,
       thoughtsVisible: () => controller?.thoughtsVisible ?? true,
     })
   }

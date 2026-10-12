@@ -9,17 +9,20 @@ export const CONFIG = {
   ai: {
     /** The engine always plays this side; the human plays the other. */
     color: 'b' as Color,
-    /** Search depth in plies. */
-    depth: 3,
-    /** How long each candidate move stays on screen while the engine "thinks". */
-    playbackIntervalMs: 800,
-    /** If the engine gets further ahead than this many events, skip to the latest few. */
-    maxQueuedEvents: 20,
-    keepWhenTrimmed: 5,
+    /** The deepest it will ever search, in plies. It usually stops sooner, when its time is up. */
+    maxDepth: 10,
+    /** How long it may think about a move. */
+    thinkTimeMs: 1200,
+    /**
+     * The thoughts are replayed so you can follow them, but the replay is capped:
+     * at most this many lines are shown, each for up to `playbackIntervalMs`.
+     */
+    maxReplayLines: 5,
+    playbackIntervalMs: 600,
     /** Pause between showing the final decision and actually making the move. */
-    decisionPauseMs: 2000,
+    decisionPauseMs: 1000,
     /** Short pause before moving when the thought visuals are switched off. */
-    quietMoveDelayMs: 500,
+    quietMoveDelayMs: 300,
   },
   animation: {
     moveSeconds: 0.5,
