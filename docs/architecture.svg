@@ -85,11 +85,11 @@
   <g fill="#777" font-size="10.5">
     <text x="750" y="138">parse request,</text>
     <text x="750" y="152">post each result</text>
-    <text x="750" y="224">negamax, alpha-beta,</text>
-    <text x="750" y="238">quiescence, ordering,</text>
-    <text x="750" y="252">mate scores</text>
-    <text x="750" y="318">material + piece-</text>
-    <text x="750" y="332">square tables</text>
+    <text x="750" y="224">iterative deepening,</text>
+    <text x="750" y="238">alpha-beta, hash table,</text>
+    <text x="750" y="252">pruning, quiescence</text>
+    <text x="750" y="318">phase-blended score,</text>
+    <text x="750" y="332">pawn structure</text>
   </g>
   <g stroke="#666" fill="none" marker-end="url(#w)">
     <path d="M830 164 V184"/>
@@ -107,7 +107,7 @@
   <rect x="20" y="400" width="920" height="84" fill="#0e0e0e" stroke="#ccb066"/>
   <text x="36" y="424" fill="#ccb066" font-size="12" font-weight="700" letter-spacing="2">CORE</text>
   <text x="104" y="424" fill="#ddd" font-size="12">pure TypeScript. No DOM, no Three.js, no timers.</text>
-  <text x="36" y="446" fill="#777" font-size="10.5">Position (make / unmake)  |  movegen (legal moves, perft-tested)  |  Game (rules, result, repetition)  |  SAN</text>
+  <text x="36" y="446" fill="#777" font-size="10.5">Position (make / unmake, hashing)  |  movegen (perft-tested)  |  Game (rules, result, repetition)  |  SAN</text>
   <text x="36" y="464" fill="#777" font-size="10.5">The same code decides which squares light up for you and which moves the engine is allowed to search.</text>
 
   <g stroke="#ccb066" stroke-dasharray="4 4" fill="none" marker-end="url(#a)">

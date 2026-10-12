@@ -3,11 +3,6 @@
     <pattern id="dots" width="20" height="20" patternUnits="userSpaceOnUse">
       <circle cx="1" cy="1" r="1" fill="#ffffff" fill-opacity="0.05"/>
     </pattern>
-    <radialGradient id="glow">
-      <stop offset="0.45" stop-color="#2cff7a" stop-opacity="0"/>
-      <stop offset="0.7" stop-color="#2cff7a" stop-opacity="0.55"/>
-      <stop offset="1" stop-color="#2cff7a" stop-opacity="0"/>
-    </radialGradient>
     <marker id="g" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto">
       <path d="M0 0 L10 5 L0 10 z" fill="#ccb066"/>
     </marker>
@@ -42,10 +37,6 @@
     </g>
   </g>
 
-  <!-- aura around black king (e8) -->
-  <circle cx="265" cy="85" r="34" fill="url(#glow)"/>
-  <circle cx="265" cy="85" r="26" fill="none" stroke="#2cff7a" stroke-width="2" stroke-opacity="0.9"/>
-
   <!-- pieces -->
   <g font-size="13" font-weight="700" text-anchor="middle">
     <circle cx="265" cy="85" r="15" fill="#1a1a1a" stroke="#888"/><text x="265" y="90" fill="#ddd">K</text>
@@ -70,7 +61,7 @@
   <g font-size="11" font-weight="700">
     <circle cx="500" cy="84" r="11" fill="#ccb066"/><text x="500" y="88" fill="#090909" text-anchor="middle">A</text>
     <text x="522" y="80" fill="#ddd">Arrows</text>
-    <text x="522" y="96" fill="#888" font-weight="400" font-size="10.5">Each candidate is drawn in cyan as it is reviewed.</text>
+    <text x="522" y="96" fill="#888" font-weight="400" font-size="10.5">Its best move so far, in cyan, changes as it looks deeper.</text>
     <text x="522" y="109" fill="#888" font-weight="400" font-size="10.5">The final choice turns thick and gold.</text>
 
     <circle cx="500" cy="152" r="11" fill="#00ffff"/><text x="500" y="156" fill="#090909" text-anchor="middle">B</text>
@@ -78,24 +69,20 @@
     <text x="522" y="164" fill="#888" font-weight="400" font-size="10.5">A wireframe copy of the piece after the move, and a</text>
     <text x="522" y="177" fill="#888" font-weight="400" font-size="10.5">line through the squares the expected replies land on.</text>
 
-    <circle cx="500" cy="220" r="11" fill="#2cff7a"/><text x="500" y="224" fill="#090909" text-anchor="middle">C</text>
-    <text x="522" y="216" fill="#ddd">King aura</text>
-    <text x="522" y="232" fill="#888" font-weight="400" font-size="10.5">Green = it thinks it's winning. Red = losing.</text>
-    <text x="522" y="245" fill="#888" font-weight="400" font-size="10.5">Blue = about even.</text>
   </g>
 
   <!-- log panel -->
   <rect x="490" y="280" width="440" height="190" fill="#0e0e0e" stroke="#2a2a2a"/>
   <path d="M490 292 V280 H502" stroke="#ccb066" fill="none"/>
   <path d="M930 458 V470 H918" stroke="#ccb066" fill="none"/>
-  <circle cx="512" cy="304" r="11" fill="#ccb066"/><text x="512" y="308" fill="#090909" font-size="11" font-weight="700" text-anchor="middle">D</text>
+  <circle cx="512" cy="304" r="11" fill="#ccb066"/><text x="512" y="308" fill="#090909" font-size="11" font-weight="700" text-anchor="middle">C</text>
   <text x="532" y="308" fill="#ccb066" font-size="11" font-weight="700" letter-spacing="2">AI THOUGHT PROCESS</text>
   <line x1="506" y1="320" x2="914" y2="320" stroke="#262626"/>
   <g font-size="10.5">
-    <text x="506" y="342" fill="#aaa">Thinking about moving Knight to h6 to improve its position (+0.10)</text>
-    <text x="506" y="364" fill="#aaa">Thinking about moving Knight to e7 to improve its position (+0.25)</text>
-    <text x="506" y="386" fill="#6fc">Aggressive move: Knight to f6 to improve its position (-0.45)</text>
-    <text x="506" y="414" fill="#fff" font-weight="700">Decided to move Knight to f6 to improve its position (-0.45)</text>
+    <text x="506" y="342" fill="#aaa">Thinking about moving Knight to e7 to improve (+0.10, depth 3)</text>
+    <text x="506" y="364" fill="#aaa">Thinking about moving Knight to h6 to improve (+0.25, depth 5)</text>
+    <text x="506" y="386" fill="#6fc">Aggressive move: Knight to f6 to improve (-0.45, depth 7)</text>
+    <text x="506" y="414" fill="#fff" font-weight="700">Decided to move Knight to f6 to improve (-0.45, depth 8)</text>
   </g>
   <text x="506" y="452" fill="#555" font-size="10">+ white is ahead, - black is ahead (in pawns)</text>
 
